@@ -3,10 +3,12 @@ package org.example.model.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -18,8 +20,7 @@ import java.util.UUID;
 public class User {
 
     @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name="UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @UuidGenerator
     @Column(updatable = false, nullable = false)
     private UUID id;
 
@@ -46,5 +47,11 @@ public class User {
     @CreationTimestamp
     @Column(updatable = false)
     private Instant createdAt;
+
+    @OneToMany(mappedBy = "authorId", cascade = CascadeType.ALL)
+    private List<Card> cards;
+
+    @OneToMany(mappedBy = "userId", cascade = CascadeType.ALL)
+    private List<Likes> likes;
 }
 
