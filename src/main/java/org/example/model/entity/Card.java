@@ -34,11 +34,11 @@ public class Card {
     @JoinColumn(name="author_id", nullable=false)
     private User authorId;
 
-    private int currentHelpers;
+    private int currentHelpers = 0;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
-    private Status status;
+    private Status status = Status.OPEN;
 
     private String type;
 
