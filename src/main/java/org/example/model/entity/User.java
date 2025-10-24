@@ -7,8 +7,6 @@ import org.hibernate.annotations.UuidGenerator;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -52,6 +50,6 @@ public class User {
     private List<Card> cards;
 
     @OneToMany(mappedBy = "userId", cascade = CascadeType.ALL)
-    private List<Likes> likes;
+    private List<Like> likes;
 }
 

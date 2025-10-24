@@ -14,7 +14,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Likes {
+public class Like {
     @Id
     @UuidGenerator
     @Column(updatable = false, nullable = false)
@@ -26,7 +26,7 @@ public class Likes {
 
     @ManyToOne
     @JoinColumn(name="card_id", nullable=false)
-    private User cardId;
+    private Card cardId;
 
     @CreationTimestamp
     @Column(updatable = false)

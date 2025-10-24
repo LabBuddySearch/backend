@@ -1,0 +1,38 @@
+package org.example.service;
+
+import lombok.RequiredArgsConstructor;
+import org.example.dto.LikeDto;
+import org.example.model.entity.Card;
+import org.example.model.entity.Like;
+import org.example.model.entity.User;
+import org.example.repository.CardRepository;
+import org.example.repository.LikeRepository;
+import org.example.repository.UserRepository;
+import org.springframework.stereotype.Service;
+
+import java.util.UUID;
+
+@Service
+@RequiredArgsConstructor
+public class LikeService {
+
+    private final UserRepository userRepository;
+    private final CardRepository cardRepository;
+    private final LikeRepository likeRepository;
+
+    public String like(LikeDto dto) {
+        User user = userRepository.findById(dto.getUserId())
+                .orElseThrow(() -> new IllegalStateException("Пользователь не найден"));
+        Card card = cardRepository.findById(dto.getCardId())
+                .orElseThrow(() -> new IllegalStateException("Карточка не найдена"));
+        Like like = Like.builder()
+                .userId(user)
+                .cardId(card)
+                .build();
+        likeRepository.save(like);
+        card.setCurrentHelpers(card.getCurrentHelpers()+1);
+        cardRepository.save(card);
+        return "Success";
+    }
+
+}
