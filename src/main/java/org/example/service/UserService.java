@@ -25,7 +25,7 @@ public class UserService {
 
         User user = User.builder()
                 .email(dto.getEmail())
-                .passwordHash(passwordEncoder.encode(dto.getPassword()))
+                .password(passwordEncoder.encode(dto.getPassword()))
                 .name(dto.getName())
                 .city(dto.getCity())
                 .study(dto.getStudy())
@@ -41,7 +41,7 @@ public class UserService {
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Неверный email или пароль"));
 
-        if (!passwordEncoder.matches(dto.getPassword(), user.getPasswordHash())) {
+        if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
             throw new IllegalArgumentException("Неверный email или пароль");
         }
 

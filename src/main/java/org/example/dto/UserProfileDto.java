@@ -3,6 +3,7 @@ package org.example.dto;
 import lombok.*;
 
 import java.time.Instant;
+import java.util.Map;
 import java.util.UUID;
 
 @Data
@@ -17,6 +18,6 @@ public class UserProfileDto {
     private String study;
     private String description;
     private String photoUrl;
-    private String socialLinks;
+    private Map<String, String> socialLinks;
     private Instant createdAt;
 }

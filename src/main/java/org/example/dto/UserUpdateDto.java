@@ -2,6 +2,8 @@ package org.example.dto;
 
 import lombok.Data;
 
+import java.util.Map;
+
 @Data
 public class UserUpdateDto {
     private String name;
@@ -9,5 +11,5 @@ public class UserUpdateDto {
     private String study;
     private String description;
     private String photoUrl;
-    private String socialLinks;
+    private Map<String, String> socialLinks;
 }

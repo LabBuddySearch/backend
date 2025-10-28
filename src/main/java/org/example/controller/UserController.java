@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.dto.*;
 import org.example.service.UserService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -36,5 +37,11 @@ public class UserController {
     public ResponseEntity<UserProfileDto> updateProfile(@PathVariable UUID id, @RequestBody UserUpdateDto dto) {
         return ResponseEntity.ok(userService.updateProfile(id, dto));
     }
-}
+
+
+    @GetMapping("/me")
+        public String getCurrentUser(Authentication authentication) {
+            return "Hello, " + authentication.getName() + "!";
+        }
+    }
 
