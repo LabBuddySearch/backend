@@ -19,21 +19,25 @@ public class CardDto {
 
     private UUID id;
 
+    private UUID authorId;
+
+    private String type;
+
+    private String subject;
+
     private String title;
 
     private String description;
 
-    private String tags;
+    private String study;
 
-    private UUID authorId;
+    private String city;
 
-    private int currentHelpers;
+    private int course;
 
     private Status status;
 
-    private String type;
+    private int currentHelpers;
 
     private Instant createdAt;
-
-    private String infoProfiles;
 }

@@ -35,7 +35,7 @@ public class CardController {
     }
 
     @DeleteMapping("/user/{card_id}")
-    public ResponseEntity<String> deleteCard(@PathVariable UUID cardId){
+    public ResponseEntity<String> deleteCard(@PathVariable UUID cardId) {
         return ResponseEntity.ok(cardService.delete(cardId));
     }
 
@@ -45,10 +45,12 @@ public class CardController {
     }
 
     @GetMapping("")
-    public ResponseEntity<List<CardDto>> getFilteredCards(@RequestParam String university,
-                                                          @RequestParam String city,
-                                                          @RequestParam String type){
-        return ResponseEntity.ok(cardService.getFiltered(university, city, type));
+    public ResponseEntity<List<CardDto>> getFilteredCards(@RequestParam(required = false) String type,
+                                                          @RequestParam(required = false) String subject,
+                                                          @RequestParam(required = false) String study,
+                                                          @RequestParam(required = false) String city
+    ) {
+        return ResponseEntity.ok(cardService.getFiltered(type, subject, study, city));
     }
 }
 

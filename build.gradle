@@ -25,6 +25,8 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
+    // for jsonb type
+    implementation("io.hypersistence:hypersistence-utils-hibernate-60:3.9.0")
 
 }
 
