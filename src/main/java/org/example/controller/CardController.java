@@ -6,6 +6,7 @@ import org.example.dto.CardCreateDto;
 import org.example.dto.CardDto;
 import org.example.dto.CardEditDto;
 import org.example.service.CardService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,6 +36,7 @@ public class CardController {
     }
 
     @DeleteMapping("/user/{card_id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<String> deleteCard(@PathVariable UUID cardId) {
         return ResponseEntity.ok(cardService.delete(cardId));
     }

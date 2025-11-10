@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.dto.CardCreateDto;
 import org.example.dto.CardDto;
 import org.example.dto.CardEditDto;
+import org.example.errors.UserNotFoundException;
 import org.example.model.entity.Card;
 import org.example.model.entity.User;
 import org.example.repository.CardRepository;
@@ -24,7 +25,7 @@ public class CardService {
     public CardDto create(CardCreateDto dto) {
 
         User author = userRepository.findById(dto.getAuthorId())
-                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+                .orElseThrow(() -> new UserNotFoundException(dto.getAuthorId()));
 
 
         Card card = Card.builder()
