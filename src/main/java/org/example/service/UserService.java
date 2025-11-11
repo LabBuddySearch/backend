@@ -8,6 +8,7 @@ import org.example.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -81,5 +82,35 @@ public class UserService {
                 .socialLinks(user.getSocialLinks())
                 .createdAt(user.getCreatedAt())
                 .build();
+    }
+
+    public User getByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found: " + email));
+    }
+
+    public User updateUser(String email, UserUpdateRequest request) {
+        User user = getByEmail(email);
+
+        Optional.ofNullable(request.getName()).ifPresent(user::setName);
+        Optional.ofNullable(request.getCity()).ifPresent(user::setCity);
+        Optional.ofNullable(request.getStudy()).ifPresent(user::setStudy);
+        Optional.ofNullable(request.getDescription()).ifPresent(user::setDescription);
+        Optional.ofNullable(request.getSocialLinks()).ifPresent(user::setSocialLinks);
+        Optional.ofNullable(request.getPhotoUrl()).ifPresent(user::setPhotoUrl);
+        Optional.ofNullable(request.getPassword())
+                .ifPresent(pwd -> user.setPassword(passwordEncoder.encode(pwd)));
+
+        return userRepository.save(user);
+    }
+
+    public User updatePhoto(String email, String photoUrl) {
+        User user = getByEmail(email);
+        user.setPhotoUrl(photoUrl);
+        return userRepository.save(user);
+    }
+
+    public void deleteByEmail(String email) {
+        userRepository.findByEmail(email).ifPresent(userRepository::delete);
     }
 }
