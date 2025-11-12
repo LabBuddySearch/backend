@@ -21,9 +21,9 @@ spring:
 #    show-sql: true
 
 app:
-  jwt:
-    secret: very_secret_key_replace_in_prod_change_this
-    expiration-ms: 86400000
+  jwt:jwt:
+    secret: "verysecretkeyverysecretkey123456"
+    expiration: 3600000
 
 logging:
   level:
