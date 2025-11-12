@@ -47,6 +47,7 @@ public class LikeService {
 //                .findFirst().orElseThrow(
 //                        () ->  new RuntimeException("Cannot dislike")
 //                );
+//        card.setCurrentHelpers(card.getCurrentHelpers() - 1);
 //        likeRepository.delete(like);
     }
 
