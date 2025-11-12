@@ -3,7 +3,6 @@ package org.example.model.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import org.hibernate.annotations.UuidGenerator;
@@ -11,6 +10,7 @@ import org.hibernate.annotations.UuidGenerator;
 import java.time.Instant;
 import java.util.Map;
 import java.util.UUID;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -22,8 +22,7 @@ import java.util.UUID;
 public class User {
 
     @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @UuidGenerator
     @Column(updatable = false, nullable = false)
     private UUID id;
 
