@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -25,9 +26,9 @@ public class CardController {
         return ResponseEntity.ok(cardService.create(dto));
     }
 
-    @GetMapping("/user/{user_id}")
-    public ResponseEntity<List<CardDto>> getCreatedCards(@PathVariable UUID userId) {
-        return ResponseEntity.ok(cardService.getCreated(userId));
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<CardDto>> getCreatedCards(@PathVariable String userId) {
+        return ResponseEntity.ok(cardService.getCreated(UUID.fromString(userId)));
     }
 
     @PatchMapping("/user")
@@ -35,10 +36,10 @@ public class CardController {
         return ResponseEntity.ok(cardService.edit(dto));
     }
 
-    @DeleteMapping("/user/{card_id}")
+    @DeleteMapping("/user/{cardId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<String> deleteCard(@PathVariable UUID cardId) {
-        return ResponseEntity.ok(cardService.delete(cardId));
+    public void deleteCard(@PathVariable UUID cardId) {
+        cardService.delete(cardId);
     }
 
     @GetMapping("")
@@ -46,13 +47,13 @@ public class CardController {
         return ResponseEntity.ok(cardService.getAll());
     }
 
-    @GetMapping("")
+    @GetMapping("/filter")
     public ResponseEntity<List<CardDto>> getFilteredCards(@RequestParam(required = false) String type,
-                                                          @RequestParam(required = false) String subject,
+                                                          @RequestParam(required = false) String city,
                                                           @RequestParam(required = false) String study,
-                                                          @RequestParam(required = false) String city
+                                                          @RequestParam(required = false) Integer course
     ) {
-        return ResponseEntity.ok(cardService.getFiltered(type, subject, study, city));
+        return ResponseEntity.ok(cardService.getFiltered(type, city, study, course));
     }
 }
 

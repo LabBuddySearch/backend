@@ -2,6 +2,7 @@ package org.example.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.example.dto.ErrorDto;
+import org.example.errors.CardNotFoundException;
 import org.example.errors.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +15,7 @@ import org.springframework.web.context.request.WebRequest;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<ErrorDto> handleUserNofFound(
+    public ResponseEntity<ErrorDto> handleUserNotFound(
             UserNotFoundException ex,
             WebRequest request
     ) {
@@ -28,6 +29,23 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
+
+    @ExceptionHandler(CardNotFoundException.class)
+    public ResponseEntity<ErrorDto> handleCardNotFound(
+            CardNotFoundException ex,
+            WebRequest request
+    ) {
+
+        ErrorDto error = new ErrorDto(
+                ex.getMessage(),
+                ex.getErrorCode()
+        );
+
+        log.warn("Card not found: {}", ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorDto> handleAllUncaught(

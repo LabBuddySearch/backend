@@ -4,7 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.dto.LikeDto;
 import org.example.service.LikeService;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,8 +15,9 @@ public class LikeController {
     private final LikeService likeService;
 
     @PostMapping("")
-    public ResponseEntity<String> likeCard(@Valid @RequestBody LikeDto dto){
-        return ResponseEntity.ok(likeService.like(dto));
+    @ResponseStatus(HttpStatus.OK)
+    public void likeCard(@Valid @RequestBody LikeDto dto){
+        likeService.like(dto);
     }
 
 }

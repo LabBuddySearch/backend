@@ -47,10 +47,12 @@ public class Card {
 
     private int course;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private Status status = Status.OPEN;
 
+    @Builder.Default
     private int currentHelpers = 0;
 
     @CreationTimestamp

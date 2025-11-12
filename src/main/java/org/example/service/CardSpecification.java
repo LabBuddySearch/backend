@@ -10,9 +10,9 @@ public class CardSpecification {
                 criteriaBuilder.equal(root.get("type"), type));
     }
 
-    public static Specification<Card> hasSubject(String subject) {
+    public static Specification<Card> hasCourse(String course) {
         return ((root, query, criteriaBuilder) ->
-                criteriaBuilder.equal(root.get("subject"), subject));
+                criteriaBuilder.equal(root.get("course"), course));
     }
 
     public static Specification<Card> hasStudy(String study) {

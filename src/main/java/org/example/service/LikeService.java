@@ -2,6 +2,8 @@ package org.example.service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.dto.LikeDto;
+import org.example.errors.CardNotFoundException;
+import org.example.errors.UserNotFoundException;
 import org.example.model.entity.Card;
 import org.example.model.entity.Like;
 import org.example.model.entity.User;
@@ -16,23 +18,26 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class LikeService {
 
-    private final UserRepository userRepository;
-    private final CardRepository cardRepository;
-    private final LikeRepository likeRepository;
+//    private final UserRepository userRepository;
+//    private final CardRepository cardRepository;
+//    private final LikeRepository likeRepository;
 
-    public String like(LikeDto dto) {
-        User user = userRepository.findById(dto.getUserId())
-                .orElseThrow(() -> new IllegalStateException("Пользователь не найден"));
-        Card card = cardRepository.findById(dto.getCardId())
-                .orElseThrow(() -> new IllegalStateException("Карточка не найдена"));
-        Like like = Like.builder()
-                .userId(user)
-                .cardId(card)
-                .build();
-        likeRepository.save(like);
-        card.setCurrentHelpers(card.getCurrentHelpers()+1);
-        cardRepository.save(card);
-        return "Success";
+    public void like(LikeDto dto) {
+//        User user = userRepository.findById(dto.getUserId())
+//                .orElseThrow(() -> new UserNotFoundException(dto.getUserId()));
+//        Card card = cardRepository.findById(dto.getCardId())
+//                .orElseThrow(() -> new CardNotFoundException(dto.getCardId()));
+//        Like like = Like.builder()
+//                .userId(user)
+//                .cardId(card)
+//                .build();
+//        likeRepository.save(like);
+//        card.setCurrentHelpers(card.getCurrentHelpers()+1);
+//        cardRepository.save(card);
+    }
+
+    public void dislike(LikeDto dto){
+
     }
 
 }
