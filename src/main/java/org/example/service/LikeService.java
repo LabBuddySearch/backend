@@ -37,7 +37,17 @@ public class LikeService {
     }
 
     public void dislike(LikeDto dto){
-
+//        User user = userRepository.findById(dto.getUserId())
+//                .orElseThrow(() -> new UserNotFoundException(dto.getUserId()));
+//        Card card = cardRepository.findById(dto.getCardId())
+//                .orElseThrow(() -> new CardNotFoundException(dto.getCardId()));
+//        Like like = likeRepository.findAll().stream()
+//                .filter(l -> l.getUserId().getId().equals(dto.getUserId()))
+//                .filter(l -> l.getCardId().getId().equals(dto.getCardId()))
+//                .findFirst().orElseThrow(
+//                        () ->  new RuntimeException("Cannot dislike")
+//                );
+//        likeRepository.delete(like);
     }
 
 }

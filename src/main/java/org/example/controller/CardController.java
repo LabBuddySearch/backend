@@ -11,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -27,8 +26,8 @@ public class CardController {
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<CardDto>> getCreatedCards(@PathVariable String userId) {
-        return ResponseEntity.ok(cardService.getCreated(UUID.fromString(userId)));
+    public ResponseEntity<List<CardDto>> getCreatedCards(@PathVariable UUID userId) {
+        return ResponseEntity.ok(cardService.getCreated(userId));
     }
 
     @PatchMapping("/user")

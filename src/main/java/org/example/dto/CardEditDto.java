@@ -23,5 +23,5 @@ public class CardEditDto {
 
     private String city;
 
-    private int course;
+    private Integer course;
 }

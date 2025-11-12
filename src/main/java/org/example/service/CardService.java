@@ -134,13 +134,15 @@ public class CardService {
 //        return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId))
 //                .getCards().stream().map(this::mapToDto).toList();
 
-        return cards.stream().map(this::mapToDto).toList();
+        return cards.stream().filter(c -> c.getAuthorId().getId().equals(userId)).map(this::mapToDto).toList();
     }
 
     public CardDto edit(CardEditDto dto) {
 
 //        Card card = cardRepository.findById(dto.getId())
 //                .orElseThrow(() -> new CardNotFoundException(dto.getId()));
+
+//        cardRepository.save(card);
 
         Card card = cards.stream().filter(c -> c.getId().equals(dto.getId())).findFirst().orElseThrow(
                 () -> new CardNotFoundException(dto.getId())
@@ -152,15 +154,12 @@ public class CardService {
         if (dto.getDescription() != null) card.setDescription(dto.getDescription());
         if (dto.getStudy() != null) card.setStudy(dto.getStudy());
         if (dto.getCity() != null) card.setCity(dto.getCity());
-        if (dto.getCourse() != 0) card.setCourse(dto.getCourse());
-
-
-//        cardRepository.save(card);
+        if (dto.getCourse() != null) card.setCourse(dto.getCourse());
 
         return mapToDto(card);
     }
 
-    public void delete(UUID cardId) {
+    public void delete(UUID cardId) throws CardNotFoundException {
 
 //        Card card = cardRepository.findById(cardId)
 //                .orElseThrow(() -> new CardNotFoundException(cardId));
