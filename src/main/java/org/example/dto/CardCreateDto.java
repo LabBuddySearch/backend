@@ -11,6 +11,7 @@ import java.util.UUID;
 @Data
 public class CardCreateDto {
 
+    @NotNull(message = "authorId обязателен")
     private UUID authorId;
 
     @NotNull

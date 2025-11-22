@@ -7,13 +7,13 @@ import org.example.dto.CardEditDto;
 import org.example.errors.CardNotFoundException;
 import org.example.errors.UserNotFoundException;
 import org.example.model.entity.Card;
-import org.example.model.entity.Like;
 import org.example.model.entity.User;
 import org.example.repository.CardRepository;
 import org.example.repository.UserRepository;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
