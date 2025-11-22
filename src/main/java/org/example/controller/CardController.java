@@ -30,6 +30,12 @@ public class CardController {
         return ResponseEntity.ok(cardService.getCreated(userId));
     }
 
+    @GetMapping("/user/{userId}/liked")
+    public ResponseEntity<List<CardDto>> getLikedCards(@PathVariable UUID userId) {
+        return ResponseEntity.ok(cardService.getLiked(userId));
+    }
+
+
     @PatchMapping("/user")
     public ResponseEntity<CardDto> editCard(@Valid @RequestBody CardEditDto dto) {
         return ResponseEntity.ok(cardService.edit(dto));
@@ -54,5 +60,7 @@ public class CardController {
     ) {
         return ResponseEntity.ok(cardService.getFiltered(type, city, study, course));
     }
+
+
 }
 

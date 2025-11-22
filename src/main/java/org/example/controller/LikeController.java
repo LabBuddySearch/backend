@@ -20,7 +20,7 @@ public class LikeController {
         likeService.like(dto);
     }
 
-    @DeleteMapping
+    @DeleteMapping("")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void dislikeCard(@Valid @RequestBody LikeDto dto) {
         likeService.dislike(dto);

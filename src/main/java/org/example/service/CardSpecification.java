@@ -10,7 +10,7 @@ public class CardSpecification {
                 criteriaBuilder.equal(root.get("type"), type));
     }
 
-    public static Specification<Card> hasCourse(String course) {
+    public static Specification<Card> hasCourse(Integer course) {
         return ((root, query, criteriaBuilder) ->
                 criteriaBuilder.equal(root.get("course"), course));
     }
