@@ -27,7 +27,9 @@ public class SecurityConfig {
                                 "/api/public/**",
                                 "/api/cards/**",
                                 "/api/users/register",
-                                "/api/like/**"
+                                "/api/like/**",
+                                "/swagger-ui/**",
+                                "/v3/**"
                         ).permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
