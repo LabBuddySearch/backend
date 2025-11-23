@@ -1,7 +1,9 @@
 package org.example.controller;
 
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.example.dto.ChangePasswordDto;
 import org.example.dto.UserUpdateRequest;
 import org.example.model.entity.User;
 import org.example.service.UserService;
@@ -42,6 +44,15 @@ public class SettingsController {
 
         User updated = userService.updatePhoto(userDetails.getUsername(), photoUrl);
         return ResponseEntity.ok(updated);
+    }
+
+    // Сменить пароль
+    @PutMapping("/password")
+    public ResponseEntity<Void> changePassword(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @Valid @RequestBody ChangePasswordDto dto) {
+        userService.changePassword(userDetails.getUsername(), dto);
+        return ResponseEntity.ok().build();
     }
 
     // Удалить профиль

@@ -37,9 +37,7 @@ public class UserService {
     }
 
     public UserProfileDto login(UserLoginDto dto) {
-        User user = userRepository.findAll().stream()
-                .filter(u -> u.getEmail().equalsIgnoreCase(dto.getEmail()))
-                .findFirst()
+        User user = userRepository.findByEmail(dto.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("Неверный email или пароль"));
 
         if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
@@ -112,5 +110,16 @@ public class UserService {
 
     public void deleteByEmail(String email) {
         userRepository.findByEmail(email).ifPresent(userRepository::delete);
+    }
+
+    public void changePassword(String email, ChangePasswordDto dto) {
+        User user = getByEmail(email);
+
+        if (!passwordEncoder.matches(dto.getOldPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("Неверный старый пароль");
+        }
+
+        user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
+        userRepository.save(user);
     }
 }
