@@ -20,9 +20,6 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Set up Docker
-        uses: docker/setup-buildx-action@v2
-
       - name: Build and start backend
         run: |
           echo "=== Building backend Docker image ==="
