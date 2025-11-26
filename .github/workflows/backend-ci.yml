@@ -20,16 +20,16 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Build and start backend
-        run: |
-          echo "=== Building backend Docker image ==="
-          docker build -t backend:ci ./backend
-          echo "=== Starting backend container ==="
-          docker run -d --name backend-ci -p 8080:8080 backend:ci
+      - name: Build backend
+        run: ./mvnw clean package -DskipTests
 
-      - name: Wait for backend to be ready
+      - name: Start backend
         run: |
-          echo "Waiting for backend to respond..."
+          nohup java -jar target/*.jar > backend.log 2>&1 &
+          echo $! > backend.pid
+
+      - name: Wait for backend
+        run: |
           for i in {1..30}; do
             if curl -s http://localhost:8080/api/public/ping | grep -q pong; then
               echo "Backend is up!"
@@ -45,6 +45,7 @@ jobs:
       - name: Run full smoke tests
         run: bash backend/tests/bash/smoke_all.sh
 
-      - name: Stop backend container
+      - name: Stop backend
         if: always()
-        run: docker stop backend-ci && docker rm backend-ci
+        run: |
+          kill $(cat backend.pid) || true
