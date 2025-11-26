@@ -3,12 +3,15 @@ name: Backend CI
 on:
   push:
     branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
   backend-tests:
     runs-on: ubuntu-latest
     env:
       API_URL: http://localhost:8080/api
+      KEEP_DATA: true
 
     steps:
       - name: Checkout repository
@@ -24,7 +27,7 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build backend
-        run: ./gradlew build -x test
+        run: ./gradlew bootJar -x test
 
       - name: Start backend
         run: |
@@ -36,7 +39,7 @@ jobs:
         run: |
           echo "Waiting for backend to respond..."
           for i in {1..30}; do
-            if curl -s http://localhost:8080/api/public/ping | grep -q pong; then
+            if curl -s "$API_URL/public/ping" | grep -q pong; then
               echo "Backend is up!"
               break
             fi
@@ -44,7 +47,7 @@ jobs:
             sleep 2
           done
 
-      - name: Install dependencies for tests
+      - name: Install dependencies for smoke tests
         run: sudo apt-get update && sudo apt-get install -y curl jq
 
       - name: Run full smoke tests
