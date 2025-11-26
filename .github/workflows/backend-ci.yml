@@ -30,14 +30,14 @@ jobs:
 
       - name: Start backend (with in-memory DB)
         run: |
-          echo "=== Starting backend with test profile ==="
-          nohup java -jar build/libs/*-SNAPSHOT.jar --spring.profiles.active=test > backend.log 2>&1 &
+          echo "=== Starting backend with test profile on port 8080 ==="
+          nohup java -jar build/libs/*-SNAPSHOT.jar --spring.profiles.active=test --server.port=8080 > backend.log 2>&1 &
           echo $! > backend.pid
 
       - name: Wait for backend to respond
         run: |
           echo "Waiting for backend to respond..."
-          for i in {1..30}; do
+          for i in {1..60}; do
             if curl -sSf ${{ env.API_URL }}/public/ping >/dev/null; then
               echo "Backend is up!"
               exit 0
@@ -45,7 +45,8 @@ jobs:
             echo "Waiting 2s..."
             sleep 2
           done
-          echo "Backend did not start in time"
+          echo "Backend did not start in time. Showing last 50 lines of backend.log:"
+          tail -n 50 backend.log
           exit 1
 
       - name: Install jq
