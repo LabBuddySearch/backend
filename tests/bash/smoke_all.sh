@@ -16,12 +16,12 @@ export API_USER="smoke-user-$UNIQ"
 
 # Запуск отдельных smoke-тестов
 log "1️⃣  Проверка карточек"
-bash backend/tests/bash/cards_smoke.sh
+bash tests/bash/cards_smoke.sh
 
 log "2️⃣  Проверка смены пароля"
-bash backend/tests/bash/change_password_smoke.sh
+bash tests/bash/change_password_smoke.sh
 
 log "3️⃣  Проверка лайков"
-bash backend/tests/bash/likes_smoke.sh
+bash tests/bash/likes_smoke.sh
 
 log "🎉 FULL SMOKE TEST COMPLETED SUCCESSFULLY"
