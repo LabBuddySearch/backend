@@ -2,16 +2,19 @@ name: Backend CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ main ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ main ]
+
+env:
+  API_URL: http://localhost:8080/api
 
 jobs:
   backend-tests:
     runs-on: ubuntu-latest
-    env:
-      API_URL: http://localhost:8080/api
-      KEEP_DATA: true
+    defaults:
+      run:
+        shell: bash
 
     steps:
       - name: Checkout repository
@@ -20,35 +23,36 @@ jobs:
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
-          java-version: '17'
-          distribution: 'temurin'
-
-      - name: Make Gradle wrapper executable
-        run: chmod +x ./gradlew
+          java-version: 17
+          distribution: temurin
 
       - name: Build backend
-        run: ./gradlew bootJar -x test
+        run: ./gradlew clean build -x test
 
       - name: Start backend
         run: |
-          echo "Starting backend..."
+          echo "=== Starting backend ==="
           nohup java -jar build/libs/*.jar > backend.log 2>&1 &
           echo $! > backend.pid
 
       - name: Wait for backend to be ready
         run: |
           echo "Waiting for backend to respond..."
-          for i in {1..30}; do
-            if curl -s "$API_URL/public/ping" | grep -q pong; then
-              echo "Backend is up!"
-              break
+          n=0
+          until curl -s "$API_URL/public/ping" | grep -q pong; do
+            n=$((n+1))
+            if [ $n -ge 30 ]; then
+              echo "Backend did not start in time" >&2
+              cat backend.log
+              exit 1
             fi
             echo "Waiting 2s..."
             sleep 2
           done
+          echo "Backend is up!"
 
       - name: Install dependencies for smoke tests
-        run: sudo apt-get update && sudo apt-get install -y curl jq
+        run: sudo apt-get update && sudo apt-get install -y jq curl
 
       - name: Run full smoke tests
         run: bash tests/bash/smoke_all.sh
@@ -56,6 +60,7 @@ jobs:
       - name: Stop backend
         if: always()
         run: |
+          echo "Stopping backend..."
           if [ -f backend.pid ]; then
             kill $(cat backend.pid) || true
           fi
