@@ -21,18 +21,20 @@ jobs:
           distribution: 'temurin'
 
       - name: Install Maven
-        run: sudo apt-get update && sudo apt-get install -y maven
+        run: sudo apt-get update && sudo apt-get install -y maven curl jq
 
       - name: Build backend
         run: mvn clean package -DskipTests
 
       - name: Start backend
         run: |
+          echo "Starting backend..."
           nohup java -jar target/*.jar > backend.log 2>&1 &
           echo $! > backend.pid
 
-      - name: Wait for backend
+      - name: Wait for backend to be ready
         run: |
+          echo "Waiting for backend to respond..."
           for i in {1..30}; do
             if curl -s http://localhost:8080/api/public/ping | grep -q pong; then
               echo "Backend is up!"
@@ -42,13 +44,12 @@ jobs:
             sleep 2
           done
 
-      - name: Install jq
-        run: sudo apt-get install -y jq
-
-      - name: Run full smoke tests
+      - name: Run smoke tests
         run: bash backend/tests/bash/smoke_all.sh
 
       - name: Stop backend
         if: always()
         run: |
-          kill $(cat backend.pid) || true
+          if [ -f backend.pid ]; then
+            kill $(cat backend.pid) || true
+          fi
