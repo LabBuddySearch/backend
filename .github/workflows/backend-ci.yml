@@ -28,6 +28,15 @@ jobs:
       - name: Build backend
         run: ./gradlew clean bootJar -x test
 
+      - name: Verify JAR exists
+        run: |
+          echo "Checking build/libs for JAR..."
+          ls -la build/libs/
+          if [ -z "$(ls build/libs/*-SNAPSHOT.jar 2>/dev/null)" ]; then
+            echo "❌ JAR не найден, сборка завершилась с ошибкой"
+            exit 1
+          fi
+
       - name: Start backend
         run: |
           echo "=== Starting backend ==="
@@ -37,7 +46,7 @@ jobs:
       - name: Wait for backend to respond
         run: |
           echo "Waiting for backend to respond..."
-          for i in {1..30}; do
+          for i in {1..60}; do  # 60 * 2s = 2 минуты
             if curl -sSf ${{ env.API_URL }}/public/ping >/dev/null; then
               echo "Backend is up!"
               exit 0
@@ -46,6 +55,8 @@ jobs:
             sleep 2
           done
           echo "Backend did not start in time"
+          echo "=== Backend logs ==="
+          cat backend.log
           exit 1
 
       - name: Install jq
