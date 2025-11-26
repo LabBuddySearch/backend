@@ -47,7 +47,7 @@ jobs:
       - name: Install dependencies for tests
         run: sudo apt-get update && sudo apt-get install -y curl jq
 
-      - name: Run smoke tests
+      - name: Run full smoke tests
         run: bash tests/bash/smoke_all.sh
 
       - name: Stop backend
