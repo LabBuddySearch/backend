@@ -6,27 +6,13 @@ spring:
     password:
 
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
       ddl-auto: create-drop
+    show-sql: true
     properties:
       hibernate:
         format_sql: true
-    show-sql: true
 
-  sql:
-    init:
-      mode: always
-
-
-flyway:
-  enabled: false
-
-liquibase:
-  enabled: false
-
-logging:
-  level:
-    org.springframework: INFO
-    org.hibernate.SQL: DEBUG
-    your.root.package: DEBUG
+  h2:
+    console:
+      enabled: false

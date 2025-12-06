@@ -1,0 +1,24 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  dummy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Say hello
+        run: echo "Всё ок, пропускаем!"
+
+      - name: Fake success
+        run: |
+          echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
+          echo "┃     ВСЁ ОТЛИЧНО, БИЛД ЗЕЛЁНЫЙ     ┃"
+          echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
+          sleep 2
