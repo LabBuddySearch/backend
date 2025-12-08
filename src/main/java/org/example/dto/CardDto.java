@@ -7,9 +7,11 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @AllArgsConstructor
@@ -40,4 +42,8 @@ public class CardDto {
     private int currentHelpers;
 
     private Instant createdAt;
+
+    private List<String> original;
+
+    private List<String> storage;
 }

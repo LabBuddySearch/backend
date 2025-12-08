@@ -1,13 +1,12 @@
 package org.example.model.entity;
 
-import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -59,5 +58,7 @@ public class Card {
     @Column(updatable = false)
     private Instant createdAt;
 
+    @OneToMany(mappedBy = "cardId", cascade = CascadeType.ALL)
+    private List<File> files;
 }
 
