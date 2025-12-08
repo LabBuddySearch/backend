@@ -21,7 +21,7 @@ public class File {
     private UUID id;
 
     @ManyToOne
-    @JoinColumn(name="card_id", nullable=false)
+    @JoinColumn(name="card_id")
     private Card cardId;
 
     @Column(length = 128, nullable = false)

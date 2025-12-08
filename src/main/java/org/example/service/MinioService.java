@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
@@ -23,6 +24,7 @@ import java.util.UUID;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class MinioService {
 
     @Autowired
@@ -91,17 +93,17 @@ public class MinioService {
         return new InputStreamResource(stream);
     }
 
+
     public void deleteFile(UUID fileId) throws Exception {
         File file = fileRepository.findById(fileId)
                 .orElseThrow(() -> new FileNotFoundException(fileId));
-        fileRepository.delete(file);
         minioClient.removeObject(
                 RemoveObjectArgs.builder()
                         .bucket(bucketName)
                         .object(file.getStorage())
                         .build()
         );
-
+        fileRepository.delete(file);
     }
 
     private void createBucketIfNotExists() throws Exception {

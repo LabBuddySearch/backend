@@ -60,8 +60,8 @@ public class CardController {
     }
 
 
-    @PatchMapping("/user")
-    public ResponseEntity<CardDto> editCard(@Valid @RequestBody CardEditDto dto) {
+    @PatchMapping(value="/user", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<CardDto> editCard(@Valid @ModelAttribute CardEditDto dto) {
         return ResponseEntity.ok(cardService.edit(dto));
     }
 

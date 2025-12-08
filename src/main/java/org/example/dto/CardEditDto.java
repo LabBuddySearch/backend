@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -26,5 +27,5 @@ public class CardEditDto {
 
     private Integer course;
 
-    private MultipartFile[] files;
+    private List<MultipartFile> files;
 }

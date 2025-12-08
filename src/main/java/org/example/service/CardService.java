@@ -5,6 +5,7 @@ import org.example.dto.CardCreateDto;
 import org.example.dto.CardDto;
 import org.example.dto.CardEditDto;
 import org.example.errors.CardNotFoundException;
+import org.example.errors.FileNotFoundException;
 import org.example.errors.UserNotFoundException;
 import org.example.model.entity.Card;
 import org.example.model.entity.File;
@@ -75,6 +76,16 @@ public class CardService {
         if (dto.getStudy() != null) card.setStudy(dto.getStudy());
         if (dto.getCity() != null) card.setCity(dto.getCity());
         if (dto.getCourse() != null) card.setCourse(dto.getCourse());
+        if (dto.getFiles() != null) {
+            card.getFiles().forEach(file -> {
+                try {
+                    minioService.deleteFile(file.getId());
+                } catch (Exception e) {
+                    throw new FileNotFoundException(file.getId());
+                }
+            });
+            card.setFiles(minioService.uploadFiles(dto.getFiles(), card));
+        }
 
         cardRepository.save(card);
         return mapToDto(card);
@@ -84,6 +95,13 @@ public class CardService {
 
         Card card = cardRepository.findById(cardId)
                 .orElseThrow(() -> new CardNotFoundException(cardId));
+        card.getFiles().forEach(file -> {
+            try {
+                minioService.deleteFile(file.getId());
+            } catch (Exception e) {
+                throw new FileNotFoundException(file.getId());
+            }
+        });
         cardRepository.delete(card);
     }
 
