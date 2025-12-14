@@ -5,13 +5,16 @@ import org.example.dto.CardCreateDto;
 import org.example.dto.CardDto;
 import org.example.dto.CardEditDto;
 import org.example.errors.CardNotFoundException;
+import org.example.errors.FileNotFoundException;
 import org.example.errors.UserNotFoundException;
 import org.example.model.entity.Card;
+import org.example.model.entity.File;
 import org.example.model.entity.User;
 import org.example.repository.CardRepository;
 import org.example.repository.UserRepository;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -22,6 +25,7 @@ public class CardService {
 
     private final CardRepository cardRepository;
     private final UserRepository userRepository;
+    private final MinioService minioService;
 
 
     public CardDto create(CardCreateDto dto) {
@@ -39,8 +43,11 @@ public class CardService {
                 .course(dto.getCourse())
                 .build();
 
-        cardRepository.save(card);
+        card = cardRepository.save(card);
 
+        card.setFiles(minioService.uploadFiles(dto.getFiles(), card));
+
+        card = cardRepository.save(card);
         return mapToDto(card);
     }
 
@@ -48,6 +55,7 @@ public class CardService {
 
         return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId))
                 .getCards().stream().map(this::mapToDto).toList();
+
     }
 
     public List<CardDto> getLiked(UUID userId) {
@@ -68,6 +76,16 @@ public class CardService {
         if (dto.getStudy() != null) card.setStudy(dto.getStudy());
         if (dto.getCity() != null) card.setCity(dto.getCity());
         if (dto.getCourse() != null) card.setCourse(dto.getCourse());
+        if (dto.getFiles() != null) {
+            card.getFiles().forEach(file -> {
+                try {
+                    minioService.deleteFile(file.getId());
+                } catch (Exception e) {
+                    throw new FileNotFoundException(file.getId());
+                }
+            });
+            card.setFiles(minioService.uploadFiles(dto.getFiles(), card));
+        }
 
         cardRepository.save(card);
         return mapToDto(card);
@@ -77,6 +95,13 @@ public class CardService {
 
         Card card = cardRepository.findById(cardId)
                 .orElseThrow(() -> new CardNotFoundException(cardId));
+        card.getFiles().forEach(file -> {
+            try {
+                minioService.deleteFile(file.getId());
+            } catch (Exception e) {
+                throw new FileNotFoundException(file.getId());
+            }
+        });
         cardRepository.delete(card);
     }
 
@@ -101,7 +126,6 @@ public class CardService {
     }
 
 
-
     private CardDto mapToDto(Card card) {
         return CardDto.builder()
                 .id(card.getId())
@@ -116,6 +140,8 @@ public class CardService {
                 .status(card.getStatus())
                 .currentHelpers(card.getCurrentHelpers())
                 .createdAt(card.getCreatedAt())
+                .original(card.getFiles().stream().map(File::getOriginal).toList())
+                .storage(card.getFiles().stream().map(File::getStorage).toList())
                 .build();
     }
 
