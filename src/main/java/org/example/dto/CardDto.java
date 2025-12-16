@@ -23,6 +23,8 @@ public class CardDto {
 
     private UUID authorId;
 
+    private String authorName;
+
     private String type;
 
     private String subject;
