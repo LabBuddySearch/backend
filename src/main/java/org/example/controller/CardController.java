@@ -1,23 +1,17 @@
 package org.example.controller;
 
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.dto.CardCreateDto;
 import org.example.dto.CardDto;
 import org.example.dto.CardEditDto;
 import org.example.service.CardService;
-import org.example.service.MinioService;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.InputStream;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,11 +21,30 @@ import java.util.UUID;
 public class CardController {
 
     private final CardService cardService;
-    private final MinioService minioService;
 
     @PostMapping(value = "/user", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<CardDto> createCard(@Valid @ModelAttribute CardCreateDto dto) {
-
+    public ResponseEntity<CardDto> createCard(
+            @RequestParam("authorId") UUID authorId,
+            @RequestParam("type") String type,
+            @RequestParam("subject") String subject,
+            @RequestParam("title") String title,
+            @RequestParam(value = "description", required = false) String description,
+            @RequestParam(value = "study", required = false) String study,
+            @RequestParam(value = "city", required = false) String city,
+            @RequestParam(value = "course", defaultValue = "0") int course,
+            @RequestParam(value = "files", required = false) List<MultipartFile> files) {
+        
+        CardCreateDto dto = new CardCreateDto();
+        dto.setAuthorId(authorId);
+        dto.setType(type);
+        dto.setSubject(subject);
+        dto.setTitle(title);
+        dto.setDescription(description);
+        dto.setStudy(study);
+        dto.setCity(city);
+        dto.setCourse(course);
+        dto.setFiles(files);
+        
         return ResponseEntity.ok(cardService.create(dto));
     }
 
@@ -40,28 +53,8 @@ public class CardController {
         return ResponseEntity.ok(cardService.getCreated(userId));
     }
 
-    @GetMapping("/download/{filename}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable String filename) {
-        try {
-            return ResponseEntity.ok()
-                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                    .header(HttpHeaders.CONTENT_DISPOSITION,
-                            "attachment; filename=\"" + filename + "\"")
-                    .body(minioService.getFileAsResource(filename));
-
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
-    @GetMapping("/user/{userId}/liked")
-    public ResponseEntity<List<CardDto>> getLikedCards(@PathVariable UUID userId) {
-        return ResponseEntity.ok(cardService.getLiked(userId));
-    }
-
-
-    @PatchMapping(value="/user", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<CardDto> editCard(@Valid @ModelAttribute CardEditDto dto) {
+    @PatchMapping("/user")
+    public ResponseEntity<CardDto> editCard(@Valid @RequestBody CardEditDto dto) {
         return ResponseEntity.ok(cardService.edit(dto));
     }
 
@@ -84,7 +77,5 @@ public class CardController {
     ) {
         return ResponseEntity.ok(cardService.getFiltered(type, city, study, course));
     }
-
-
 }
 

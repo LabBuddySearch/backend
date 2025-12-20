@@ -5,17 +5,18 @@ import org.example.dto.CardCreateDto;
 import org.example.dto.CardDto;
 import org.example.dto.CardEditDto;
 import org.example.errors.CardNotFoundException;
-import org.example.errors.FileNotFoundException;
 import org.example.errors.UserNotFoundException;
 import org.example.model.entity.Card;
-import org.example.model.entity.File;
 import org.example.model.entity.User;
 import org.example.repository.CardRepository;
 import org.example.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,13 +26,19 @@ public class CardService {
 
     private final CardRepository cardRepository;
     private final UserRepository userRepository;
-    private final MinioService minioService;
+    
+    @Autowired(required = false)
+    private org.example.service.MinioService minioService;
 
-
+    @Transactional
     public CardDto create(CardCreateDto dto) {
+        if (dto.getAuthorId() == null) {
+            throw new IllegalArgumentException("authorId обязателен");
+        }
 
         User author = userRepository.findById(dto.getAuthorId())
                 .orElseThrow(() -> new UserNotFoundException(dto.getAuthorId()));
+
         Card card = Card.builder()
                 .authorId(author)
                 .authorName(author.getName())
@@ -42,31 +49,34 @@ public class CardService {
                 .study(dto.getStudy() == null ? author.getStudy() : dto.getStudy())
                 .city(dto.getCity() == null ? author.getCity() : dto.getCity())
                 .course(dto.getCourse())
+                .files(new ArrayList<>())
                 .build();
 
-        card = cardRepository.save(card);
+        Card saved = cardRepository.save(card);
 
-        card.setFiles(minioService.uploadFiles(dto.getFiles(), card));
+        // Загружаем файлы, если они есть и MinioService доступен
+        if (dto.getFiles() != null && !dto.getFiles().isEmpty() && minioService != null) {
+            try {
+                List<org.example.model.entity.File> uploadedFiles = minioService.uploadFiles(dto.getFiles(), saved);
+                saved.setFiles(uploadedFiles);
+                saved = cardRepository.save(saved);
+            } catch (Exception e) {
+                // Логируем ошибку, но не падаем - карточка уже создана
+                System.err.println("Ошибка при загрузке файлов: " + e.getMessage());
+            }
+        }
 
-        card = cardRepository.save(card);
-        return mapToDto(card);
+        return mapToDto(saved);
     }
 
     public List<CardDto> getCreated(UUID userId) {
-
-        return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId))
-                .getCards().stream().map(this::mapToDto).toList();
-
+        return cardRepository.findAllByAuthorId_Id(userId).stream()
+                .map(this::mapToDto)
+                .toList();
     }
 
-    public List<CardDto> getLiked(UUID userId) {
-
-        return cardRepository.findLikedCardsByUserId(userId)
-                .stream().map(this::mapToDto).toList();
-    }
-
+    @Transactional
     public CardDto edit(CardEditDto dto) {
-
         Card card = cardRepository.findById(dto.getId())
                 .orElseThrow(() -> new CardNotFoundException(dto.getId()));
 
@@ -77,43 +87,24 @@ public class CardService {
         if (dto.getStudy() != null) card.setStudy(dto.getStudy());
         if (dto.getCity() != null) card.setCity(dto.getCity());
         if (dto.getCourse() != null) card.setCourse(dto.getCourse());
-        if (dto.getFiles() != null) {
-            card.getFiles().forEach(file -> {
-                try {
-                    minioService.deleteFile(file.getId());
-                } catch (Exception e) {
-                    throw new FileNotFoundException(file.getId());
-                }
-            });
-            card.setFiles(minioService.uploadFiles(dto.getFiles(), card));
-        }
 
-        cardRepository.save(card);
-        return mapToDto(card);
+        return mapToDto(cardRepository.save(card));
     }
 
-    public void delete(UUID cardId) throws CardNotFoundException {
-
+    @Transactional
+    public void delete(UUID cardId) {
         Card card = cardRepository.findById(cardId)
                 .orElseThrow(() -> new CardNotFoundException(cardId));
-        card.getFiles().forEach(file -> {
-            try {
-                minioService.deleteFile(file.getId());
-            } catch (Exception e) {
-                throw new FileNotFoundException(file.getId());
-            }
-        });
         cardRepository.delete(card);
     }
 
     public List<CardDto> getAll() {
-
-        return cardRepository.findAll().stream().map(this::mapToDto).toList();
-
+        return cardRepository.findAll().stream()
+                .map(this::mapToDto)
+                .toList();
     }
 
     public List<CardDto> getFiltered(String type, String city, String study, Integer course) {
-
         Specification<Card> spec = Specification.where(null);
         if (type != null) spec = spec.and(CardSpecification.hasType(type));
         if (course != null) spec = spec.and(CardSpecification.hasCourse(course));
@@ -123,9 +114,7 @@ public class CardService {
         return cardRepository.findAll(spec).stream()
                 .map(this::mapToDto)
                 .toList();
-
     }
-
 
     private CardDto mapToDto(Card card) {
         return CardDto.builder()
@@ -142,8 +131,6 @@ public class CardService {
                 .status(card.getStatus())
                 .currentHelpers(card.getCurrentHelpers())
                 .createdAt(card.getCreatedAt())
-                .original(card.getFiles().stream().map(File::getOriginal).toList())
-                .storage(card.getFiles().stream().map(File::getStorage).toList())
                 .build();
     }
 

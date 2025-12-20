@@ -1,8 +1,10 @@
 package org.example.model.entity;
 
+import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.Instant;
@@ -26,8 +28,11 @@ public class Card {
     @JoinColumn(name="author_id", nullable=false)
     private User authorId;
 
-    @Column(nullable = false)
+    @Column(name = "author_name", length = 128)
     private String authorName;
+
+    @OneToMany(mappedBy = "cardId", cascade = CascadeType.ALL, orphanRemoval = true)
+    private java.util.List<org.example.model.entity.File> files;
 
     @Column(length = 32, nullable = false)
     private String type;
@@ -61,7 +66,5 @@ public class Card {
     @Column(updatable = false)
     private Instant createdAt;
 
-    @OneToMany(mappedBy = "cardId", cascade = CascadeType.ALL)
-    private List<File> files;
 }
 
