@@ -34,6 +34,7 @@ public class CardService {
                 .orElseThrow(() -> new UserNotFoundException(dto.getAuthorId()));
         Card card = Card.builder()
                 .authorId(author)
+                .authorName(author.getName())
                 .type(dto.getType())
                 .subject(dto.getSubject())
                 .title(dto.getTitle())
@@ -130,6 +131,7 @@ public class CardService {
         return CardDto.builder()
                 .id(card.getId())
                 .authorId(card.getAuthorId().getId())
+                .authorName(card.getAuthorName())
                 .type(card.getType())
                 .subject(card.getSubject())
                 .title(card.getTitle())

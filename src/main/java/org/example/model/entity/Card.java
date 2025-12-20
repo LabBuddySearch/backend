@@ -26,6 +26,9 @@ public class Card {
     @JoinColumn(name="author_id", nullable=false)
     private User authorId;
 
+    @Column(nullable = false)
+    private String authorName;
+
     @Column(length = 32, nullable = false)
     private String type;
 
