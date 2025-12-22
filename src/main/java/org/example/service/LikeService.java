@@ -32,22 +32,15 @@ public class LikeService {
                 .cardId(card)
                 .build();
         likeRepository.save(like);
-        card.setCurrentHelpers(card.getCurrentHelpers()+1);
-        cardRepository.save(card);
     }
 
     public void dislike(LikeDto dto){
-        User user = userRepository.findById(dto.getUserId())
-                .orElseThrow(() -> new UserNotFoundException(dto.getUserId()));
-        Card card = cardRepository.findById(dto.getCardId())
-                .orElseThrow(() -> new CardNotFoundException(dto.getCardId()));
         Like like = likeRepository.findAll().stream()
                 .filter(l -> l.getUserId().getId().equals(dto.getUserId()))
                 .filter(l -> l.getCardId().getId().equals(dto.getCardId()))
                 .findFirst().orElseThrow(
                         () ->  new RuntimeException("Cannot dislike")
                 );
-        card.setCurrentHelpers(card.getCurrentHelpers() - 1);
         likeRepository.delete(like);
     }
 

@@ -140,7 +140,6 @@ public class CardService {
                 .city(card.getCity())
                 .course(card.getCourse())
                 .status(card.getStatus())
-                .currentHelpers(card.getCurrentHelpers())
                 .createdAt(card.getCreatedAt())
                 .original(card.getFiles().stream().map(File::getOriginal).toList())
                 .storage(card.getFiles().stream().map(File::getStorage).toList())

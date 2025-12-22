@@ -41,8 +41,6 @@ public class CardDto {
 
     private Status status;
 
-    private int currentHelpers;
-
     private Instant createdAt;
 
     private List<String> original;
