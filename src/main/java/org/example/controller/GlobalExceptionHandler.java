@@ -1,6 +1,7 @@
 package org.example.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.util.http.fileupload.impl.FileSizeLimitExceededException;
 import org.example.dto.ErrorDto;
 import org.example.errors.CardNotFoundException;
 import org.example.errors.UserNotFoundException;

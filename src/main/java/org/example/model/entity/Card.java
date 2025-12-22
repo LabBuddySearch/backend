@@ -54,9 +54,6 @@ public class Card {
     @Column(name = "status")
     private Status status = Status.OPEN;
 
-    @Builder.Default
-    private int currentHelpers = 0;
-
     @CreationTimestamp
     @Column(updatable = false)
     private Instant createdAt;
