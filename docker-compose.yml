@@ -26,8 +26,6 @@ services:
     ports:
       - "8080:8080"
     environment:
-      # These variables will be overridden by application.yml for local development,
-      # but are good to have for consistency and potential future override in production
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/labsterdb
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
