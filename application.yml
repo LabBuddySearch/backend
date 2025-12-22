@@ -4,7 +4,7 @@ spring:
       max-file-size: 10MB
       max-request-size: 10MB
   datasource:
-    url: jdbc:postgresql://localhost:5432/labsterdb
+    url: jdbc:postgresql://postgres:5432/labsterdb
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
@@ -19,7 +19,7 @@ spring:
 
 
 minio:
-  endpoint: http://localhost:9000
+  endpoint: http://minio:9000
   access-key: minioadmin
   secret-key: minioadmin123
   bucket-name: uploads
