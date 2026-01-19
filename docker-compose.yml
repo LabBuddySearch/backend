@@ -21,6 +21,14 @@ services:
     volumes:
       - minio_data:/data
 
+  frontend:
+    build: ./frontend
+    ports:
+      # Frontend (nginx) will be available on http://localhost:3000
+      - "3000:80"
+    depends_on:
+      - backend
+
   backend:
     build: .
     ports:

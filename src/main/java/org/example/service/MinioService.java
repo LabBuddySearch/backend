@@ -40,37 +40,59 @@ public class MinioService {
     public List<File> uploadFiles(List<MultipartFile> files, Card c) {
         card = c;
         List<File> uploaded = new ArrayList<>();
+        
+        if (files == null || files.isEmpty()) {
+            return uploaded;
+        }
+        
         for (MultipartFile file : files) {
             try {
+                // Пропускаем пустые файлы и файлы-маркеры
+                if (file == null || 
+                    file.isEmpty() || 
+                    file.getOriginalFilename() == null ||
+                    file.getOriginalFilename().contains("__NO_FILES__") ||
+                    file.getOriginalFilename().trim().isEmpty()) {
+                    log.debug("Пропущен пустой файл или маркер: {}", 
+                             file != null ? file.getOriginalFilename() : "null");
+                    continue;
+                }
+                
                 uploaded.add(uploadSingleFile(file));
             } catch (Exception e) {
                 log.error("Ошибка при загрузке файла {}: {}",
-                        file.getOriginalFilename(), e.getMessage());
-                throw new FileUploadException(file.getName());
+                        file != null ? file.getOriginalFilename() : "null", e.getMessage());
+                throw new FileUploadException(file != null ? file.getName() : "unknown");
             }
         }
         return uploaded;
     }
 
     private File uploadSingleFile(MultipartFile file) throws Exception {
-        try {
-            createBucketIfNotExists();
-        } catch (Exception e) {
-            log.error("Ошибка при создании бакета");
-        }
+        // Убеждаемся, что bucket существует
+        createBucketIfNotExists();
 
         String originalFilename = file.getOriginalFilename();
+        if (originalFilename == null || originalFilename.trim().isEmpty()) {
+            throw new IllegalArgumentException("Имя файла не может быть пустым");
+        }
+
         String fileExtension = getFileExtension(originalFilename);
         String storageFilename = generateStorageFilename(fileExtension);
 
-        minioClient.putObject(
-                PutObjectArgs.builder()
-                        .bucket(bucketName)
-                        .object(storageFilename)
-                        .stream(file.getInputStream(), file.getSize(), -1)
-                        .contentType(file.getContentType())
-                        .build()
-        );
+        try {
+            minioClient.putObject(
+                    PutObjectArgs.builder()
+                            .bucket(bucketName)
+                            .object(storageFilename)
+                            .stream(file.getInputStream(), file.getSize(), -1)
+                            .contentType(file.getContentType() != null ? file.getContentType() : "application/octet-stream")
+                            .build()
+            );
+        } catch (Exception e) {
+            log.error("Ошибка при загрузке файла в MinIO: {}", originalFilename, e);
+            throw new FileUploadException("Не удалось загрузить файл: " + originalFilename);
+        }
 
         File new_file = File.builder()
                 .cardId(card)
@@ -79,18 +101,36 @@ public class MinioService {
                 .build();
 
         fileRepository.save(new_file);
+        log.debug("Файл успешно загружен: {} -> {}", originalFilename, storageFilename);
         return new_file;
     }
 
     public Resource getFileAsResource(String storageFilename) throws Exception {
-        InputStream stream = minioClient.getObject(
-                GetObjectArgs.builder()
-                        .bucket(bucketName)
-                        .object(storageFilename)
-                        .build()
-        );
+        try {
+            // Проверяем существование файла в MinIO
+            minioClient.statObject(
+                    StatObjectArgs.builder()
+                            .bucket(bucketName)
+                            .object(storageFilename)
+                            .build()
+            );
+            
+            // Если файл существует, получаем его
+            InputStream stream = minioClient.getObject(
+                    GetObjectArgs.builder()
+                            .bucket(bucketName)
+                            .object(storageFilename)
+                            .build()
+            );
 
-        return new InputStreamResource(stream);
+            return new InputStreamResource(stream);
+        } catch (io.minio.errors.ErrorResponseException e) {
+            log.error("Файл не найден в MinIO: {}", storageFilename);
+            throw new FileNotFoundException(storageFilename);
+        } catch (Exception e) {
+            log.error("Ошибка при получении файла {}: {}", storageFilename, e.getMessage());
+            throw new FileNotFoundException(storageFilename);
+        }
     }
 
 
@@ -107,18 +147,24 @@ public class MinioService {
     }
 
     private void createBucketIfNotExists() throws Exception {
-        boolean exists = minioClient.bucketExists(
-                BucketExistsArgs.builder()
-                        .bucket(bucketName)
-                        .build()
-        );
-
-        if (!exists) {
-            minioClient.makeBucket(
-                    MakeBucketArgs.builder()
+        try {
+            boolean exists = minioClient.bucketExists(
+                    BucketExistsArgs.builder()
                             .bucket(bucketName)
                             .build()
             );
+
+            if (!exists) {
+                minioClient.makeBucket(
+                        MakeBucketArgs.builder()
+                                .bucket(bucketName)
+                                .build()
+                );
+                log.info("✅ MinIO bucket '{}' успешно создан", bucketName);
+            }
+        } catch (Exception e) {
+            log.error("❌ Ошибка при проверке/создании MinIO bucket '{}': {}", bucketName, e.getMessage());
+            throw e;
         }
     }
 
